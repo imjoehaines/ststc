@@ -65,15 +65,15 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] <| Array.toList <| Array.indexedMap viewAttack model.attacks
+        [ div [] (Array.toList (Array.indexedMap viewAttack model.attacks))
         , viewAttack (Array.length model.attacks) 0
         , div []
             [ label [] [ text "Block" ]
-            , input [ value <| String.fromInt model.block, onInput createEditBlock ] []
+            , input [ value (String.fromInt model.block), onInput createEditBlock ] []
             ]
         , div []
             [ text "Total damage: "
-            , text <| String.fromInt <| calculateDamage model
+            , text (String.fromInt (calculateDamage model))
             ]
         ]
 
@@ -81,19 +81,19 @@ view model =
 viewAttack : Int -> Int -> Html Msg
 viewAttack index attack =
     div []
-        [ label [] [ text "Attack value ", text <| String.fromInt <| index + 1 ]
-        , input [ value <| String.fromInt attack, onInput (createEditAttack index) ] []
+        [ label [] [ text "Attack value ", text (String.fromInt (index + 1)) ]
+        , input [ value (String.fromInt attack), onInput (createEditAttack index) ] []
         ]
 
 
 createEditAttack : Int -> String -> Msg
 createEditAttack index value =
-    EditAttack index <| Maybe.withDefault 0 <| String.toInt value
+    EditAttack index (Maybe.withDefault 0 (String.toInt value))
 
 
 createEditBlock : String -> Msg
 createEditBlock value =
-    EditBlock <| Maybe.withDefault 0 <| String.toInt value
+    EditBlock (Maybe.withDefault 0 (String.toInt value))
 
 
 calculateDamage : Model -> Int
