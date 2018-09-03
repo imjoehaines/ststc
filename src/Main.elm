@@ -18,12 +18,16 @@ main =
 
 
 type alias Model =
-    { attacks : Array Int }
+    { attacks : Array Int
+    , block : Int
+    }
 
 
 initialModel : Model
 initialModel =
-    { attacks = Array.repeat 1 0 }
+    { attacks = Array.repeat 1 0
+    , block = 0
+    }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -39,6 +43,7 @@ subscriptions model =
 type Msg
     = AddAttack
     | EditAttack Int Int
+    | EditBlock Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -50,6 +55,9 @@ update msg model =
         EditAttack index value ->
             ( { model | attacks = Array.set index value model.attacks }, Cmd.none )
 
+        EditBlock newBlock ->
+            ( { model | block = newBlock }, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -57,8 +65,12 @@ view model =
         [ div [] <| Array.toList <| Array.indexedMap viewAttack model.attacks
         , button [ onClick AddAttack ] [ text "+ Add attack" ]
         , div []
+            [ label [] [ text "Block" ]
+            , input [ value <| String.fromInt model.block, onInput createEditBlock ] []
+            ]
+        , div []
             [ text "Total damage: "
-            , text <| String.fromInt <| total model.attacks
+            , text <| String.fromInt <| calculateDamage model
             ]
         ]
 
@@ -76,6 +88,16 @@ createEditAttack index value =
     EditAttack index <| Maybe.withDefault 0 <| String.toInt value
 
 
-total : Array Int -> Int
-total attacks =
+createEditBlock : String -> Msg
+createEditBlock value =
+    EditBlock <| Maybe.withDefault 0 <| String.toInt value
+
+
+calculateDamage : Model -> Int
+calculateDamage model =
+    max 0 ((totalDamage model.attacks) - model.block)
+
+
+totalDamage : Array Int -> Int
+totalDamage attacks =
     Array.foldl (+) 0 attacks
