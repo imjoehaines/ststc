@@ -25,7 +25,7 @@ type alias Model =
 
 initialModel : Model
 initialModel =
-    { attacks = Array.repeat 1 0
+    { attacks = Array.empty
     , block = 0
     }
 
