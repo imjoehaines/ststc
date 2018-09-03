@@ -41,19 +41,22 @@ subscriptions model =
 
 
 type Msg
-    = AddAttack
-    | EditAttack Int Int
+    = EditAttack Int Int
     | EditBlock Int
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        AddAttack ->
-            ( { model | attacks = Array.push 0 model.attacks }, Cmd.none )
-
         EditAttack index value ->
-            ( { model | attacks = Array.set index value model.attacks }, Cmd.none )
+            let
+                newAttacks =
+                    if index >= (Array.length model.attacks) then
+                        Array.push value model.attacks
+                    else
+                        Array.set index value model.attacks
+            in
+                ( { model | attacks = newAttacks }, Cmd.none )
 
         EditBlock newBlock ->
             ( { model | block = newBlock }, Cmd.none )
@@ -63,7 +66,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ div [] <| Array.toList <| Array.indexedMap viewAttack model.attacks
-        , button [ onClick AddAttack ] [ text "+ Add attack" ]
+        , viewAttack (Array.length model.attacks) 0
         , div []
             [ label [] [ text "Block" ]
             , input [ value <| String.fromInt model.block, onInput createEditBlock ] []
